@@ -36,7 +36,7 @@ import net.minecraftforge.*;
 @Mod(modid = "FlansMod", name = "Flan's Mod", version = "2.0")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false)
 
-public class FlanMod implements ITickHandler
+public class FlansMod implements ITickHandler
 {
 	@SidedProxy(clientSide = "flan.client.ClientProxy", serverSide = "flan.server.CommonProxy")
 	public static CommonProxy proxy;
