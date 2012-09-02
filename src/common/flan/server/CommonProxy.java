@@ -11,4 +11,6 @@ public abstract class CommonProxy
      public abstract Object loadBulletModel(String[] arg0, String shortName);
 
      public abstract Object loadAAGunModel(String[] arg0, String shortName);
+
+     public abstract Object loadMGModel(String[] arg0, String shortName);
 }

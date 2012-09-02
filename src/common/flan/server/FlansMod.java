@@ -90,10 +90,186 @@ public class FlansMod implements ITickHandler
 	public static boolean originalHideGUI = false;
 	public static String errorString = "";
 	public static int errorStringTimer = 0;
+	public static HexAPI hapi;
 	
 	@Init
-	/** imported from old source to getting stuff loading. */
 	public void load(FMLInitializationEvent event)
+	{
+		log("Loading Flan's mod.");
+		TickRegistry.registerTickHandler(this, Side.SERVER);
+		File flanDir = new File(FMLClientHandler.instance().getClient().getMinecraftDir() + "/Flan/");
+		if(!flanDir.exists())
+		{
+			log("Flan folder not found. Creating empty folder.");
+			log("You should get some content packs and put them in the Flan folder.");
+			flanDir.mkdir();
+			return;
+		}
+		
+		//Properties
+		try
+		{
+			File file = new File(FMLClientHandler.instance().getClient().getMinecraftDir() + "/Flan/properties.txt");
+			if(file.exists())
+			{
+				BufferedReader properties = new BufferedReader(new FileReader(file));
+				do
+				{
+					String line = null;
+					try
+					{
+						line = properties.readLine();
+					}
+					catch(Exception e)
+					{
+						break;
+					}
+					if(line == null)
+					{
+						break;
+					}
+					if(line.startsWith("//"))
+						continue;
+					String[] split = line.split(" ");
+					if(split.length < 2)
+						continue;
+					readProperties(split, properties);
+				}
+				while(true);
+				log("Loaded properties.");
+			}
+			else 
+			{
+				log("No properties file found. Using defaults.");
+				createNewProperties();
+			}
+		}
+		catch(Exception e)
+		{
+			log("No properties file found. Using defaults.");
+			createNewProperties();
+		}
+		
+		
+		//Icons, Skins, Models
+		//Get the classloader in order to load the images
+		ClassLoader classloader = (net.minecraft.client.Minecraft.class).getClassLoader();
+		Method method = null;
+		try
+		{
+			method = (java.net.URLClassLoader.class).getDeclaredMethod("addURL", new Class[] { java.net.URL.class });
+			method.setAccessible(true);
+		}
+		catch(Exception e)
+		{
+			log("Failed to get class loader. All content loading will now fail.");
+			e.printStackTrace();
+		}
+		
+
+		List<File> contentPacks = new ArrayList<File>();
+		for(File file : flanDir.listFiles())
+		{
+			if(file.isDirectory())
+			{
+				//Add the images to the classpath so they can be loaded
+				try
+				{
+					method.invoke(classloader, new Object[] { file.toURI().toURL() } );
+					method.invoke(classloader, new Object[] { new File(file, "/models/").toURI().toURL() } );
+				}
+				catch(Exception e)
+				{
+					log("Failed to load images for content pack : " + file.getName());
+					e.printStackTrace();
+				}
+				//Add the directory to the content pack list
+				log("Loaded content pack : " + file.getName());
+				contentPacks.add(file);
+			}
+		}
+		log("Loaded textures and models.");
+		
+		//Gametypes (Server only)
+		
+		
+		//Bullets / Bombs
+		for(File file : contentPacks)
+		{
+			File bulletsDir = new File(file, "/bullets/");
+			File[] bullets = bulletsDir.listFiles();
+			if(bullets == null)
+			{
+				logQuietly("No bullet files found.");
+			}
+			else
+			{
+				for(int i = 0; i < bullets.length; i++)
+				{
+					if(bullets[i].isDirectory())
+						continue;
+					try
+					{
+						BulletType type = new BulletType(new BufferedReader(new FileReader(bullets[i])));
+						Item bulletItem = new ItemBullet(type.itemID - 256, type.iconIndex, type.colour, type).setItemName(type.shortName);
+						bulletItems.add(bulletItem);
+						LanguageRegistry.addName(bulletItem, type.name);
+					}
+					catch(Exception e)
+					{
+						log("Failed to add bullet : " + bullets[i].getName());
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		log("Loaded bullets.");
+		
+		//Guns
+		EntityRegistry.registerGlobalEntityID(EntityMG.class, "MG", EntityRegistry.findGlobalUniqueEntityId());
+		EntityRegistry.registerModEntity(EntityMG.class, "MG", 91, this, 40, 5, true);
+		for(File file : contentPacks)
+		{
+			File gunsDir = new File(file, "/guns/");
+			File[] guns = gunsDir.listFiles();
+			if(guns == null)
+			{
+				logQuietly("No gun files found.");
+			}
+			else
+			{
+				for(int i = 0; i < guns.length; i++)
+				{
+					if(guns[i].isDirectory())
+						continue;
+					try
+					{
+						GunType type = new GunType(new BufferedReader(new FileReader(guns[i])), file.getName());
+						Item gunItem = new ItemGun(type.itemID - 256, type).setItemName(type.shortName);
+						gunItems.add(gunItem);
+						LanguageRegistry.addName(gunItem, type.name);
+					}
+					catch(Exception e)
+					{
+						log("Failed to add gun : " + guns[i].getName());
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		log("Loaded guns.");
+		
+		//Recipes
+		for(InfoType type : InfoType.infoTypes)
+		{
+			type.addRecipe();
+		}
+		log("Loaded recipes.");
+		proxy.load();
+	}
+	
+	/** ~ OLD ~ */
+	/*public void load(FMLInitializationEvent event)
 	{
 		log("Loading Flan's mod.");
 		TickRegistry.registerTickHandler(this, Side.SERVER);
@@ -366,13 +542,14 @@ public class FlansMod implements ITickHandler
 		}
 		log("Loaded recipes.");
 		proxy.load();
-	}
+	}*/
 	
 	/** ~ BACKUP ~ */
 	/*public void load(FMLInitializationEvent e)
 	{
 		log("Setting up FlansMod ...");
 		TickRegistry.registerTickHandler(this, Side.SERVER);
+		HexAPI.register("Flan", PlayerBaseFlan.class);
 		File flanDir = new File(FMLClientHandler.instance().getClient().getMinecraftDir() + "/Flan/");
 		if(!flanDir.exists())
 		{
@@ -381,7 +558,6 @@ public class FlansMod implements ITickHandler
 			flanDir.mkdir();
 			return;
 		}
-		//TODO
 	}*/
 	
 	public void tickStart(EnumSet<TickType> type, Object... tickData) {}
