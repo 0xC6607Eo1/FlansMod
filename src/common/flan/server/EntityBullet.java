@@ -13,6 +13,7 @@ import net.minecraft.src.EntityDamageSourceIndirect;
 import net.minecraft.src.EntityFX;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.EntitySmokeFX;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Material;
@@ -336,9 +337,9 @@ public class EntityBullet extends Entity
 	{
 		if(entity == owner || entity == owner.riddenByEntity || entity == owner.ridingEntity)
 			return true;
-		if(owner instanceof EntityPlayer)
+		if(owner instanceof EntityPlayerMP)
 		{
-			EntityMG mg = getBase((EntityPlayer)owner).mountingGun;
+			EntityMG mg = getBase((EntityPlayerMP)owner).mountingGun;
 			if(mg != null && mg == entity)
 			{
 				return true;
@@ -347,10 +348,9 @@ public class EntityBullet extends Entity
 		return false;
 	}
 	
-	private PlayerBaseFlan getBase(EntityPlayer player)
+	private PlayerBaseFlan getBase(EntityPlayerMP player)
 	{
 		return ((PlayerBaseFlan)(FlansMod.hapi.getPlayerBase("Flan")));
-		//TODO
 	}
 	
 	public void setDead()

@@ -6,11 +6,20 @@ import net.minecraft.src.*;
 
 public abstract class CommonProxy
 {
-     public abstract void load();
-     
-     public abstract Object loadBulletModel(String[] arg0, String shortName);
+	public abstract void load();
 
-     public abstract Object loadAAGunModel(String[] arg0, String shortName);
+    public abstract Object getClientGui(int ID, EntityPlayer player, World world, int x, int y, int z);
 
-     public abstract Object loadMGModel(String[] arg0, String shortName);
+    public Container getServerGui(int ID, EntityPlayer player, World world, int x, int y, int z)
+    {
+        return null;
+    }
+    
+    public abstract Object loadBulletModel(String[] split, String shortName);
+    
+    public abstract Object loadMGModel(String[] split, String shortName);
+    
+    public abstract Object loadAAGunModel(String[] split, String shortName);
+    
+    public abstract void spawnAAGun(World world, double posX, double posY, double posZ, AAGunType type, float gunYaw, float gunPitch, Random rand, BulletType bullet, EntityAAGun entity, Entity player);
 }

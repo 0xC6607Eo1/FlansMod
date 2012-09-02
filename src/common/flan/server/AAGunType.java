@@ -58,7 +58,6 @@ public class AAGunType extends InfoType
 		}
 		while(true);
 		infoTypes.add(this);
-		//TODO 'iconIndex' missing ?
 	}
 	
 	protected void read(String[] arg0, BufferedReader file)

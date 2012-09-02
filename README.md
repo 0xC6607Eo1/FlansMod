@@ -4,12 +4,8 @@ I'm 0xC6607Eo1, and I'm using this to create backups of the mod, this would help
 and share with you.
 
 # FOR DEVELOPERS #
-Dear developers, I'm not using anything besides Forge and HexAPI.
-
-Notes :
-+ Turbo Model Thingy isnt supported now / later.
-+ Nitro Model Thingy will be supported.
-+ HexAPI comes installed
+Dear developers, I'm not using anything besides Forge, HexAPI and Nitro Model Thingy.
+All is included.
 
 # FAQ #
 + Question: What is HexAPI ?
