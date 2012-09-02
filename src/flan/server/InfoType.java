@@ -110,13 +110,13 @@ public class InfoType
 		}
 	}
 	
-	public void addRecpie()
+	public void addRecipe()
 	{
-		this.addRecpie(getItem());
+		this.addRecipe(getItem());
 	}
 	
 	/** Reimported from old code */
-	public void addRecpie(Item par1Item)
+	public void addRecipe(Item par1Item)
 	{
 		if(smeltableFrom != null)
 		{

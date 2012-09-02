@@ -68,7 +68,7 @@ public class AAGunType extends InfoType
 		{
 			if(arg0[0].equals("Model"))
 			{
-				//TODO
+				model = FlansMod.proxy.loadAAGunModel(arg0, shortName);
 			}
 			if(arg0[0].equals("Texture"))
 			{
@@ -126,12 +126,11 @@ public class AAGunType extends InfoType
 			}
 			if(arg0[0].equals("Ammo"))
 			{
-				BulletType type = null;
+				BulletType type = BulletType.getBullet(arg0[1]);
 				if(type != null)
 				{
 					ammo.add(type);
 				}
-				//TODO
 			}			
 			if(arg0[0].equals("GunnerPos"))
 			{
@@ -153,7 +152,12 @@ public class AAGunType extends InfoType
 	
 	public boolean isAmmo(ItemStack stack)
 	{
-		//TODO
+		if(stack == null)
+			return false;
+		if(stack.getItem() instanceof ItemBullet)
+		{
+			return isAmmo(((ItemBullet)stack.getItem()).type);
+		}
 		return false;
 	}
 		
