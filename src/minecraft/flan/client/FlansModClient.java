@@ -28,27 +28,27 @@ public class FlansModClient extends FlansMod
 {
 	public void load()
 	{
-		if(ABORT)
+		if (ABORT)
 		{
 			log("Failed to load dependencies! Not loading Flan's Mod.");
 			return;
 		}
 		log("Loading Flan's mod.");
-		
+
 		File flanDir = new File(FMLClientHandler.instance().getClient().getMinecraftDir() + "/Flan/");
-		if(!flanDir.exists())
+		if (!flanDir.exists())
 		{
 			log("Flan folder not found. Creating empty folder.");
 			log("You should get some content packs and put them in the Flan folder.");
 			flanDir.mkdir();
 			return;
 		}
-		
-		//Properties
+
+		// Properties
 		try
 		{
 			File file = new File(FMLClientHandler.instance().getClient().getMinecraftDir() + "/Flan/properties.txt");
-			if(file != null)
+			if (file != null)
 			{
 				BufferedReader properties = new BufferedReader(new FileReader(file));
 				do
@@ -57,221 +57,211 @@ public class FlansModClient extends FlansMod
 					try
 					{
 						line = properties.readLine();
-					}
-					catch(Exception e)
+					} catch (Exception e)
 					{
 						break;
 					}
-					if(line == null)
+					if (line == null)
 					{
 						break;
 					}
-					if(line.startsWith("//"))
+					if (line.startsWith("//"))
 						continue;
 					String[] split = line.split(" ");
-					if(split.length < 2)
+					if (split.length < 2)
 						continue;
 					readProperties(split, properties);
-				}
-				while(true);
+				} while (true);
 				log("Loaded properties.");
 			}
-		}
-		catch(Exception e)
+		} catch (Exception e)
 		{
 			log("No properties file found. Using defaults.");
 			createNewProperties();
 		}
-		
-		
-		//Icons, Skins, Models
-		//Get the classloader in order to load the images
+
+		// Icons, Skins, Models
+		// Get the classloader in order to load the images
 		ClassLoader classloader = (net.minecraft.client.Minecraft.class).getClassLoader();
 		Method method = null;
 		try
 		{
-			method = (java.net.URLClassLoader.class).getDeclaredMethod("addURL", new Class[] { java.net.URL.class });
+			method = (java.net.URLClassLoader.class).getDeclaredMethod("addURL", new Class[]
+			{ java.net.URL.class });
 			method.setAccessible(true);
-		}
-		catch(Exception e)
+		} catch (Exception e)
 		{
 			log("Failed to get class loader. All content loading will now fail.");
 			e.printStackTrace();
 		}
-		
 
 		List<File> contentPacks = new ArrayList<File>();
-		for(File file : flanDir.listFiles())
+		for (File file : flanDir.listFiles())
 		{
-			if(file.isDirectory())
+			if (file.isDirectory())
 			{
-				//Add the images to the classpath so they can be loaded
+				// Add the images to the classpath so they can be loaded
 				try
 				{
-					method.invoke(classloader, new Object[] { file.toURI().toURL() } );
-					method.invoke(classloader, new Object[] { new File(file, "/models/").toURI().toURL() } );
-				}
-				catch(Exception e)
+					method.invoke(classloader, new Object[]
+					{ file.toURI().toURL() });
+					method.invoke(classloader, new Object[]
+					{ new File(file, "/models/").toURI().toURL() });
+				} catch (Exception e)
 				{
 					log("Failed to load images for content pack : " + file.getName());
 					e.printStackTrace();
 				}
-				//Add the directory to the content pack list
+				// Add the directory to the content pack list
 				log("Loaded content pack : " + file.getName());
 				contentPacks.add(file);
 			}
 		}
 		log("Loaded textures and models.");
-		
-		//Bullets / Bombs
+
+		// Bullets / Bombs
 		MinecraftForgeClient.preloadTexture("/spriteSheets/bullets.png");
-		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, new RenderBullet());   
-		for(BulletType type : BulletType.bullets)
+		RenderingRegistry.registerEntityRenderingHandler(EntityBullet.class, new RenderBullet());
+		for (BulletType type : BulletType.bullets)
 		{
 			try
 			{
 				java.awt.image.BufferedImage bufferedimage = ModLoader.loadImage(minecraft.renderEngine, type.iconPath);
 				CustomModTextureStatic modtexturestatic = new CustomModTextureStatic("/spriteSheets/bullets.png", type.iconIndex, bufferedimage);
 				minecraft.renderEngine.registerTextureFX(modtexturestatic);
-			}
-			catch(Exception e)
+			} catch (Exception e)
 			{
 				log("Failed to override bullet icon");
 				e.printStackTrace();
 			}
 		}
 		log("Loaded bullet icons.");
-		
-		//Guns
+
+		// Guns
 		MinecraftForgeClient.preloadTexture("/spriteSheets/guns.png");
-		for(GunType type : GunType.guns)
+		for (GunType type : GunType.guns)
 		{
 			try
 			{
 				java.awt.image.BufferedImage bufferedimage = ModLoader.loadImage(minecraft.renderEngine, type.iconPath);
 				CustomModTextureStatic modtexturestatic = new CustomModTextureStatic("/spriteSheets/guns.png", type.iconIndex, bufferedimage);
 				minecraft.renderEngine.registerTextureFX(modtexturestatic);
-			}
-			catch(Exception e)
+			} catch (Exception e)
 			{
 				log("Failed to override gun icon");
 				e.printStackTrace();
 			}
 		}
 		log("Loaded gun icons.");
-		
-		//Parts
+
+		// Parts
 		MinecraftForgeClient.preloadTexture("/spriteSheets/parts.png");
-		for(PartType type : PartType.parts)
+		for (PartType type : PartType.parts)
 		{
 			try
 			{
 				java.awt.image.BufferedImage bufferedimage = ModLoader.loadImage(minecraft.renderEngine, type.iconPath);
 				CustomModTextureStatic modtexturestatic = new CustomModTextureStatic("/spriteSheets/parts.png", type.iconIndex, bufferedimage);
 				minecraft.renderEngine.registerTextureFX(modtexturestatic);
-			}
-			catch(Exception e)
+			} catch (Exception e)
 			{
 				log("Failed to override part icon");
 				e.printStackTrace();
 			}
 		}
 		log("Loaded part icons.");
-		
-		//AAGuns
-		RenderingRegistry.registerEntityRenderingHandler(EntityAAGun.class, new RenderAAGun());  
-		for(AAGunType type : AAGunType.infoTypes)
+
+		// AAGuns
+		RenderingRegistry.registerEntityRenderingHandler(EntityAAGun.class, new RenderAAGun());
+		for (AAGunType type : AAGunType.infoTypes)
 		{
 			try
 			{
 				java.awt.image.BufferedImage bufferedimage = ModLoader.loadImage(minecraft.renderEngine, type.iconPath);
 				CustomModTextureStatic modtexturestatic = new CustomModTextureStatic("/spriteSheets/planes.png", type.iconIndex, bufferedimage);
 				minecraft.renderEngine.registerTextureFX(modtexturestatic);
-			}
-			catch(Exception e)
+			} catch (Exception e)
 			{
 				log("Failed to override AAGun icon");
 				e.printStackTrace();
 			}
 		}
-		log("Loaded AA gun icons.");	
-		
-		//Gun Boxes
+		log("Loaded AA gun icons.");
+
+		// Gun Boxes
 		MinecraftForgeClient.preloadTexture("/spriteSheets/gunBoxes.png");
-		for(GunBoxType type : GunBoxType.boxes)
+		for (GunBoxType type : GunBoxType.boxes)
 		{
 			try
 			{
-				if(type.topTextureIndex != 0)
+				if (type.topTextureIndex != 0)
 				{
 					java.awt.image.BufferedImage bufferedimage = ModLoader.loadImage(minecraft.renderEngine, type.topTexturePath);
 					CustomModTextureStatic modtexturestatic = new CustomModTextureStatic("/spriteSheets/gunBoxes.png", type.topTextureIndex, bufferedimage);
 					minecraft.renderEngine.registerTextureFX(modtexturestatic);
 				}
-				
+
 				java.awt.image.BufferedImage bufferedimage1 = ModLoader.loadImage(minecraft.renderEngine, type.sideTexturePath);
 				CustomModTextureStatic modtexturestatic1 = new CustomModTextureStatic("/spriteSheets/gunBoxes.png", type.sideTextureIndex, bufferedimage1);
 				minecraft.renderEngine.registerTextureFX(modtexturestatic1);
-				
-				if(type.bottomTextureIndex != 1)
+
+				if (type.bottomTextureIndex != 1)
 				{
 					java.awt.image.BufferedImage bufferedimage2 = ModLoader.loadImage(minecraft.renderEngine, type.bottomTexturePath);
 					CustomModTextureStatic modtexturestatic2 = new CustomModTextureStatic("/spriteSheets/gunBoxes.png", type.bottomTextureIndex, bufferedimage2);
 					minecraft.renderEngine.registerTextureFX(modtexturestatic2);
 				}
-			}
-			catch(Exception e)
+			} catch (Exception e)
 			{
 				log("Failed to override gun box texture");
 				e.printStackTrace();
 			}
 		}
-		log("Loaded gun box textures.");		
+		log("Loaded gun box textures.");
 	}
-	
+
 	public static void tick()
 	{
-		//Guns
-		if(shootTime > 0)
+		// Guns
+		if (shootTime > 0)
 			shootTime--;
-		if(playerRecoil > 0)
+		if (playerRecoil > 0)
 			playerRecoil *= 0.8F;
 		minecraft.thePlayer.rotationPitch -= playerRecoil;
 		antiRecoil += playerRecoil;
-		
+
 		minecraft.thePlayer.rotationPitch += antiRecoil * 0.2F;
 		antiRecoil *= 0.8F;
-		
+
 		Item itemInHand = null;
 		ItemStack itemstackInHand = minecraft.thePlayer.inventory.getCurrentItem();
-		if(itemstackInHand != null)
+		if (itemstackInHand != null)
 			itemInHand = itemstackInHand.getItem();
-		if(itemInHand != null)
+		if (itemInHand != null)
 		{
-			if(!(itemInHand instanceof ItemGun && ((ItemGun)itemInHand).type.hasScope))
+			if (!(itemInHand instanceof ItemGun && ((ItemGun) itemInHand).type.hasScope))
 			{
 				newZoom = 1.0F;
 			}
 		}
-		
+
 		float dZoom = newZoom - playerZoom;
 		playerZoom += dZoom / 3F;
-		if(playerZoom < 1.1F && zoomOverlay != null)
+		if (playerZoom < 1.1F && zoomOverlay != null)
 		{
 			minecraft.gameSettings.mouseSensitivity = originalMouseSensitivity;
 			playerZoom = 1.0F;
 			zoomOverlay = null;
 			minecraft.gameSettings.hideGUI = originalHideGUI;
 		}
-			
+
 		String field = inMCP ? "cameraZoom" : "V";
-		if(Math.abs(playerZoom - lastPlayerZoom) > 1F / 64F)
+		if (Math.abs(playerZoom - lastPlayerZoom) > 1F / 64F)
 		{
 			try
 			{
 				ModLoader.setPrivateValue(EntityRenderer.class, minecraft.entityRenderer, field, playerZoom);
-			}
-			catch(Exception e)
+			} catch (Exception e)
 			{
 				log("I forgot to update obfuscated reflection D:");
 				throw new RuntimeException(e);
@@ -279,75 +269,74 @@ public class FlansModClient extends FlansMod
 		}
 		lastPlayerZoom = playerZoom;
 		field = inMCP ? "camRoll" : "O";
-		
-		if(controlModeSwitchTimer > 0)
+
+		if (controlModeSwitchTimer > 0)
 			controlModeSwitchTimer--;
-		if(errorStringTimer > 0)
+		if (errorStringTimer > 0)
 			errorStringTimer--;
 	}
-	
+
 	public static void setControlMode(int i)
 	{
-		if(controlModeSwitchTimer > 0)
+		if (controlModeSwitchTimer > 0)
 			return;
 		controlMode = i;
 		controlModeSwitchTimer = 40;
 	}
-	
+
 	public static void shoot()
 	{
-		//TODO : SMP guns
+		// TODO : SMP guns
 	}
-	
+
 	public static void buyGun(BlockGunBox box, int gun)
 	{
-		//TODO : SMP gun boxes
+		// TODO : SMP gun boxes
 	}
-	
+
 	public static void buyAmmo(BlockGunBox box, int ammo)
 	{
-		//TODO : SMP gun boxes
+		// TODO : SMP gun boxes
 	}
-	
+
 	private void readProperties(String[] split, BufferedReader file)
 	{
-		try 
+		try
 		{
-			if(split[0].equals("Accelerate"))
+			if (split[0].equals("Accelerate"))
 				accelerateKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("Decelerate"))
+			if (split[0].equals("Decelerate"))
 				decelerateKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("Left"))
+			if (split[0].equals("Left"))
 				leftKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("Right"))
+			if (split[0].equals("Right"))
 				rightKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("Up"))
+			if (split[0].equals("Up"))
 				upKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("Down"))
+			if (split[0].equals("Down"))
 				downKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("Exit"))
+			if (split[0].equals("Exit"))
 				exitKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("Inventory"))
+			if (split[0].equals("Inventory"))
 				inventoryKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("Bomb"))
+			if (split[0].equals("Bomb"))
 				bombKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("Shoot"))
+			if (split[0].equals("Shoot"))
 				gunKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("ControlSwitch"))
+			if (split[0].equals("ControlSwitch"))
 				controlSwitchKey = Keyboard.getKeyIndex(split[1]);
-			if(split[0].equals("Explosions"))
+			if (split[0].equals("Explosions"))
 				explosions = split[1].equals("True");
-			if(split[0].equals("Bombs"))
+			if (split[0].equals("Bombs"))
 				bombsEnabled = split[1].equals("True");
-			if(split[0].equals("Bullets"))
+			if (split[0].equals("Bullets"))
 				bulletsEnabled = split[1].equals("True");
-		}
-		catch(Exception e)
+		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void createNewProperties()
 	{
 		try
@@ -355,13 +344,12 @@ public class FlansModClient extends FlansMod
 			FileOutputStream propsOut = new FileOutputStream(new File(FMLClientHandler.instance().getClient().getMinecraftDir() + "/Flan/properties.txt"));
 			propsOut.write(("Accelerate W\r\nDecelerate S\r\nLeft A\r\nRight D\r\nUp SPACE\r\nDown LSHIFT\r\nExit E\r\nInventory R\r\nBomb V\r\nGun LCONTROL\r\nControlSwitch C\r\nExplosions True\r\nBombs True\r\nBullets True").getBytes());
 			propsOut.close();
-		}
-		catch(Exception e)
+		} catch (Exception e)
 		{
 			log("Failed to write default properties");
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static Minecraft minecraft = FMLClientHandler.instance().getClient();
 }

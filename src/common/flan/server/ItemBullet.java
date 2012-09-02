@@ -15,18 +15,18 @@ public class ItemBullet extends Item
 		setMaxDamage(type.roundsPerItem);
 		setMaxStackSize(type.maxStackSize);
 		type.item = this;
-		setTabToDisplayOn(CreativeTabs.tabCombat);	 
+		setTabToDisplayOn(CreativeTabs.tabCombat);
 	}
-	
+
 	public String getTextureFile()
-    {
-        return "/spriteSheets/bullets.png";
-    }
-	
+	{
+		return "/spriteSheets/bullets.png";
+	}
+
 	public int getColorFromDamage(int i)
-    {
-        return colour;
-    }
+	{
+		return colour;
+	}
 
 	public int colour;
 	public BulletType type;

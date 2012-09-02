@@ -7,7 +7,7 @@ public class NMTModelPolygon extends NMTModelBase
 	public NMTModelPolygon(NMTModelRenderer nmtmodelrenderer, ArrayList<NMTTextureVertex> verts)
 	{
 		super(nmtmodelrenderer);
-		for(int idx = 0; idx < verts.size(); idx++)
+		for (int idx = 0; idx < verts.size(); idx++)
 		{
 			vertices.add(verts.get(idx).vertex);
 		}
@@ -18,5 +18,5 @@ public class NMTModelPolygon extends NMTModelBase
 	{
 		return this;
 	}
-	
+
 }

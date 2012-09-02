@@ -19,9 +19,10 @@ public class NMTModelFileBlenderTXT extends NMTModelFile
 
 	protected String[] getExtensions()
 	{
-		return new String[] {"txt", "Data.txt"};
+		return new String[]
+		{ "txt", "Data.txt" };
 	}
-	
+
 	protected String getModelFormat()
 	{
 		return "BlenderTXT";

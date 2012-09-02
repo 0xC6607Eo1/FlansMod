@@ -11,7 +11,7 @@ public class ItemPart extends Item
 		type = type1;
 		setIconIndex(type.iconIndex);
 		setMaxStackSize(type.stackSize);
-		if(type.category == 9)
+		if (type.category == 9)
 		{
 			setMaxDamage(type.fuel);
 			setHasSubtypes(true);
@@ -19,16 +19,16 @@ public class ItemPart extends Item
 		type.item = this;
 		setTabToDisplayOn(CreativeTabs.tabMaterials);
 	}
-	
+
 	public String getTextureFile()
-    {
-        return "/spriteSheets/parts.png";
-    }
-	
+	{
+		return "/spriteSheets/parts.png";
+	}
+
 	public int getColorFromDamage(int i)
-    {
-        return type.colour;
-    }
+	{
+		return type.colour;
+	}
 
 	public PartType type;
 }
