@@ -1,5 +1,6 @@
 package flan.server;
 
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,15 +40,73 @@ public class InfoType
 	}
 	
 	/** Pack reader */
-	protected void read(String[] arg0)
+	protected void read(String[] arg0, BufferedReader file)
 	{
 		try
 		{
-			//TODO
+			if(arg0[0].equals("Name"))
+			{
+				name = arg0[1];
+				for(int i = 0; i < arg0.length - 2; i++)
+				{
+					name = name + " " + arg0[i + 2];
+				}
+			}
+			if(arg0[0].equals("ShortName"))
+			{
+				shortName = arg0[1];
+			}
+			if(arg0[0].equals("Colour"))
+			{
+				colour = (Integer.parseInt(arg0[1])) + ((Integer.parseInt(arg0[2])) << 8) + ((Integer.parseInt(arg0[3])) << 16);
+			}
+			if(arg0[0].equals("ItemID"))
+			{
+				itemID = Integer.parseInt(arg0[1]);
+			}
+			if(arg0[0].equals("Icon"))
+			{
+				iconPath = "/icons/" + arg0[1] + ".png";
+			}
+			if(arg0[0].equals("RecipeOutput"))
+			{
+				recipeOutput = Integer.parseInt(arg0[1]);
+			}
+			if(arg0[0].equals("Recipe"))
+			{
+				recipe = new Object[arg0.length + 2];
+				for(int i = 0; i < 3; i++)
+				{
+					String line = null;
+					line = file.readLine();
+					if(line == null)
+					{
+						continue;
+					}
+					if(line == null || line.startsWith("//"))
+					{
+						i--;
+						continue;
+					}
+					recipe[i] = line;
+				}
+				recipeLine = arg0;
+				shapeless = false;
+			}
+			if(arg0[0].equals("ShapelessRecipe"))
+			{
+				recipeLine = arg0;
+				shapeless = true;
+			}
+			if(arg0[0].equals("SmeltableFrom"))
+			{
+				smeltableFrom = arg0[1];
+			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			FlansMod.log(""+e);
+			FlansMod.log("Reading file failed : " + shortName);
+			e.printStackTrace();
 		}
 	}
 	
@@ -56,6 +115,7 @@ public class InfoType
 		this.addRecpie(getItem());
 	}
 	
+	/** Reimported from old code */
 	public void addRecpie(Item par1Item)
 	{
 		if(smeltableFrom != null)
