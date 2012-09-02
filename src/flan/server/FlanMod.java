@@ -24,10 +24,12 @@ import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
+import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.registry.TickRegistry;
 import net.minecraft.src.*;
 import net.minecraftforge.*;
 
@@ -42,7 +44,16 @@ public class FlanMod implements ITickHandler
 	@Init
 	public void load(FMLInitializationEvent e)
 	{
-		System.out.println("Setting up FlansMod ...");
+		log("Setting up FlansMod ...");
+		TickRegistry.registerTickHandler(this, Side.SERVER);
+		File flanDir = new File(FMLClientHandler.instance().getClient().getMinecraftDir() + "/Flan/");
+		if(!flanDir.exists())
+		{
+			log("Flan folder not found. Creating empty folder.");
+			log("You should get some content packs and put them in the Flan folder.");
+			flanDir.mkdir();
+			return;
+		}
 	}
 
 	public void tickStart(EnumSet<TickType> type, Object... tickData) {}
@@ -71,5 +82,10 @@ public class FlanMod implements ITickHandler
 	public String getLabel() 
 	{
 		return null;
+	}
+	
+	public static void log(String arg0)
+	{
+		System.out.println("Flan's Mod : " + arg0);
 	}
 }
