@@ -171,6 +171,24 @@ public class FlansModClient extends FlansMod
 		}
 		log("Loaded part icons.");
 
+		// Planes
+		MinecraftForgeClient.preloadTexture("/spriteSheets/planes.png");
+		RenderingRegistry.registerEntityRenderingHandler(EntityPlane.class, new RenderPlane());
+		for (PlaneType type : PlaneType.types)
+		{
+			try
+			{
+				java.awt.image.BufferedImage bufferedimage = ModLoader.loadImage(minecraft.renderEngine, type.iconPath);
+				CustomModTextureStatic modtexturestatic = new CustomModTextureStatic("/spriteSheets/planes.png", type.iconIndex, bufferedimage);
+				minecraft.renderEngine.registerTextureFX(modtexturestatic);
+			} catch (Exception e)
+			{
+				log("Failed to override plane icon");
+				e.printStackTrace();
+			}
+		}
+		log("Loaded plane icons.");
+
 		// AAGuns
 		RenderingRegistry.registerEntityRenderingHandler(EntityAAGun.class, new RenderAAGun());
 		for (AAGunType type : AAGunType.infoTypes)

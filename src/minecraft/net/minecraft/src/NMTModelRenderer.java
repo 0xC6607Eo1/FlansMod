@@ -17,6 +17,7 @@ public class NMTModelRenderer extends ModelRenderer
 	public ArrayList<NMTPolygon> polygons;
 	public boolean disableTextureMapping;
 	public boolean recompile;
+	private NMTModelBase nmt;
 
 	public NMTModelRenderer(ModelBase modelbase, String s)
 	{
@@ -291,17 +292,8 @@ public class NMTModelRenderer extends ModelRenderer
 
 	public void doMirror(boolean x, boolean y, boolean z)
 	{
-		for (int idx = 0; idx < vertices.size(); idx++)
-		{
-			NMTVertex vert = vertices.get(idx);
-			vert.baseVector.xCoord *= (x ? -1 : 1);
-			vert.baseVector.yCoord *= (y ? -1 : 1);
-			vert.baseVector.zCoord *= (z ? -1 : 1);
-		}
-		if (x ^ y ^ z)
-		{
-			flipFaces();
-		}
+		//FIXME
+		//nmt.doMirror(x, y, z);
 	}
 
 	public void flipFaces()

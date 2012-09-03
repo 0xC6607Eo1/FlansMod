@@ -79,6 +79,9 @@ public class FlansMod implements ITickHandler
 	public static String errorString = "";
 	public static int errorStringTimer = 0;
 	public static HexAPI hapi;
+	public static List<PlaneType> blueprintsUnlocked = new ArrayList<PlaneType>();
+	public static List<Item> planeItems = new ArrayList<Item>();
+	public static List<VehicleType> vehicleBlueprintsUnlocked = new ArrayList<VehicleType>();
 
 	@Init
 	public void load(FMLInitializationEvent event)
@@ -268,6 +271,46 @@ public class FlansMod implements ITickHandler
 		}
 		log("Loaded parts.");
 
+		// Planes
+		craftingTable = new BlockPlaneWorkbench(255, 1, 0).setBlockName("flansCraftingBench");
+		GameRegistry.registerBlock(craftingTable, ItemBlockManyNames.class);
+		LanguageRegistry.addName(new ItemStack(craftingTable, 1, 0), "Small Plane Crafting Table");
+		LanguageRegistry.addName(new ItemStack(craftingTable, 1, 1), "Large Plane Crafting Table");
+		LanguageRegistry.addName(new ItemStack(craftingTable, 1, 2), "Vehicle Crafting Table");
+		GameRegistry.addRecipe(new ItemStack(craftingTable, 1, 0), new Object[]
+		{ "BBB", "III", "III", Character.valueOf('B'), Item.bowlEmpty, Character.valueOf('I'), Item.ingotIron });
+		GameRegistry.addShapelessRecipe(new ItemStack(craftingTable, 1, 1), craftingTable, craftingTable);
+		EntityRegistry.registerGlobalEntityID(EntityPlane.class, "Plane", EntityRegistry.findGlobalUniqueEntityId());
+		EntityRegistry.registerModEntity(EntityPlane.class, "Plane", 90, this, 40, 5, true);
+		for (File file : contentPacks)
+		{
+			File planesDir = new File(file, "/planes/");
+			File[] planes = planesDir.listFiles();
+			if (planes == null)
+			{
+				logQuietly("No plane files found.");
+			} else
+			{
+				for (int i = 0; i < planes.length; i++)
+				{
+					if (planes[i].isDirectory())
+						continue;
+					try
+					{
+						PlaneType type = new PlaneType(new BufferedReader(new FileReader(planes[i])), file.getName());
+						Item planeItem = new ItemPlane(type.itemID - 256, type).setItemName(type.shortName);
+						planeItems.add(planeItem);
+						LanguageRegistry.addName(planeItem, type.name);
+					} catch (Exception e)
+					{
+						log("Failed to add plane : " + planes[i].getName());
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		log("Loaded planes.");
+
 		// AAGuns
 		EntityRegistry.registerGlobalEntityID(EntityAAGun.class, "AAGun", EntityRegistry.findGlobalUniqueEntityId());
 		EntityRegistry.registerModEntity(EntityAAGun.class, "AAGun", 92, this, 40, 5, true);
@@ -397,7 +440,7 @@ public class FlansMod implements ITickHandler
 		errorString = s;
 		errorStringTimer = 100;
 		System.out.println("SERIOUS PROBLEM!");
-		System.out.println("Flan's Mod : " + s);
+		log(s);
 	}
 
 	public static void buyGun(BlockGunBox box, int gun)
